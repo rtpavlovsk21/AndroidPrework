@@ -5,4 +5,4 @@ This is the first revision of the project submission for the Android Bootcamp. T
 - [x] README/GIF Walkthrough
 - [x] Issues on Github
 
-![demo gif](https://github.com/rtpavlovsk21/AndroidPrework/figures/demo.gif)
+![demo gif](https://github.com/rtpavlovsk21/AndroidPrework/blob/master/figures/demo.gif)
