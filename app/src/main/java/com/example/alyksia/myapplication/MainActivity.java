@@ -1,15 +1,18 @@
 package com.example.alyksia.myapplication;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import org.apache.commons.io.FileUtils;
 
@@ -35,12 +38,20 @@ public class MainActivity extends AppCompatActivity {
         setupListViewListener();
     }
 
+    public void hideKeyBoard(TextView tv){
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(tv.getWindowToken(), 0);
+    }
+
     public void onAddItem(View v){
         EditText etNewItem = (EditText) findViewById(R.id.etNewItem);
         String itemText = etNewItem.getText().toString();
-        itemsAdapter.add(itemText);
+        // Don't allow blank entries.
+        if(!itemText.isEmpty())
+            itemsAdapter.add(itemText);
         etNewItem.setText("");
         writeItems();
+        hideKeyBoard(etNewItem);
     }
 
     private void setupListViewListener(){
