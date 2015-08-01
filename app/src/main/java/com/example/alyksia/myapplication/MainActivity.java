@@ -12,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.apache.commons.io.FileUtils;
@@ -39,8 +40,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void hideKeyBoard(TextView tv){
-        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(tv.getWindowToken(), 0);
+        // Clear keyboard from widget
+        InputMethodManager iman = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        iman.hideSoftInputFromWindow(tv.getWindowToken(), 0);
+
+        // Set focus to layout
+        RelativeLayout myLayout = (RelativeLayout) findViewById(R.id.simpleTodoLayout);
+        myLayout.requestFocus();
     }
 
     public void onAddItem(View v){
@@ -68,15 +74,39 @@ public class MainActivity extends AppCompatActivity {
         lvItems.setOnItemClickListener(
                 new AdapterView.OnItemClickListener() {
                     @Override
+                    // Start the EditItemActivity
                     public void onItemClick(AdapterView<?> adapter, View item, int pos, long id) {
-                        Intent i = new Intent(MainActivity.this, EditItemActivity.class);
-                        String itmTxt = items.get(pos).toString();
-                        i.putExtra("edit_text", itmTxt);
-                        i.putExtra("position",pos);
-                        startActivityForResult(i, REQUEST_CODE);
+                        // Handle some focus annoyances, if the user is adding a new item then
+                        //  goes to edit an item, the keyboard is stuck with focus in MainActivity
+                        //  this also tries to fix accidental edits or activations of EditItemActivity
+                        if (focusOnEditTextItem()) {
+                            defocusNewItemEditText();
+                        } else {
+                            editAdapterView(adapter,item,pos,id);
+                        }
                         return;
                     }
                 });
+    }
+
+    public void editAdapterView(AdapterView<?> adapter, View item, int pos, long id){
+        Intent i = new Intent(MainActivity.this, EditItemActivity.class);
+        String itmTxt = items.get(pos).toString();
+        i.putExtra("edit_text", itmTxt);
+        i.putExtra("position", pos);
+        startActivityForResult(i, REQUEST_CODE);
+        return;
+    }
+
+    public boolean focusOnEditTextItem(){
+        EditText etNewItem = (EditText) findViewById(R.id.etNewItem);
+        return etNewItem.hasFocus();
+    }
+
+    public void defocusNewItemEditText(){
+        EditText etNewItem = (EditText) findViewById(R.id.etNewItem);
+        hideKeyBoard(etNewItem);
+        return;
     }
 
     @Override
