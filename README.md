@@ -6,3 +6,10 @@ This is the first revision of the project submission for the Android Bootcamp. T
 - [x] Issues on Github
 
 ![demo gif](https://github.com/rtpavlovsk21/AndroidPrework/blob/master/figures/demo.gif)
+
+Here are the list of planned features in the future.
+- [ ] SQLite persist (Planned Aug 4)
+- [ ] Improve style with custom adapter (Planned Aug 4)
+- [ ] Due Date Support (Planned Aug 8)
+- [ ] Dialog fragment (Planned Aug 8) 
+
