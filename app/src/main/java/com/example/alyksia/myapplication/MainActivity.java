@@ -1,5 +1,6 @@
 package com.example.alyksia.myapplication;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -20,6 +21,8 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<String> items;
     ArrayAdapter<String> itemsAdapter;
     ListView lvItems;
+
+    private final int REQUEST_CODE = 20;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +54,36 @@ public class MainActivity extends AppCompatActivity {
                         return true;
                     }
                 });
+        lvItems.setOnItemClickListener(
+                new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapter, View item, int pos, long id) {
+                        Intent i = new Intent(MainActivity.this, EditItemActivity.class);
+                        String itmTxt = items.get(pos).toString();
+                        i.putExtra("edit_text", itmTxt);
+                        i.putExtra("position",pos);
+                        startActivityForResult(i, REQUEST_CODE);
+                        return;
+                    }
+                });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // REQUEST_CODE is defined above
+        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
+            // Extract name value from result extras
+            String editTxt = data.getExtras().getString("edit_text");
+            int pos = data.getExtras().getInt("position");
+
+            //if pos=-1 then pos wasn't passed initially through AdapterView.OnItemClickListener or
+            // did not make it to EditItemActivity
+            if(pos>-1) {
+                items.set(pos, editTxt);
+                itemsAdapter.notifyDataSetChanged();
+                writeItems();
+            }
+        }
     }
 
     private void readItems(){
