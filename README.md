@@ -1,3 +1,13 @@
+# PRE-WORK - ToDo
+
+ToDo is an android app that allows building a todo list and basic todo items management functionality including adding new items, editing and deleting an existing item.
+
+Submitted by: Ryan Pavlovsky
+
+Time spent: 7 hrs total including installation.
+
+## User Stories
+
 This is the first revision of the project submission for the Android Bootcamp. The app below meets the requirements of the basic app. 
 - [x] Add/Remove Items
 - [x] Edit
