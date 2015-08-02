@@ -6,7 +6,10 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="ToDo"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+        android:name="com.activeandroid.app.Application" >
+        <meta-data android:name="AA_DB_NAME" android:value="ToDo.db" />
+        <meta-data android:name="AA_DB_VERSION" android:value="1" />
         <activity
             android:name=".MainActivity"
             android:icon="@drawable/ic_launcher"
@@ -21,6 +24,7 @@
             android:name=".EditItemActivity"
             android:label="@string/title_activity_edit_item" >
         </activity>
+
     </application>
 
 </manifest>

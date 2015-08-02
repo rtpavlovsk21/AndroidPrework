@@ -15,15 +15,14 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import org.apache.commons.io.FileUtils;
+import com.activeandroid.query.Select;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    ArrayList<String> items;
-    ArrayAdapter<String> itemsAdapter;
+    List<TodoItem> items;
+    ArrayAdapter<TodoItem> itemsAdapter;
     ListView lvItems;
 
     private final int REQUEST_CODE = 20;
@@ -33,8 +32,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         lvItems = (ListView) findViewById(R.id.lvItems);
-        readItems();
-        itemsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, items);
+        readItemsDB();
+        itemsAdapter = new ArrayAdapter<TodoItem>(this,android.R.layout.simple_list_item_1,items);
         lvItems.setAdapter(itemsAdapter);
         setupListViewListener();
     }
@@ -51,12 +50,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void onAddItem(View v){
         EditText etNewItem = (EditText) findViewById(R.id.etNewItem);
-        String itemText = etNewItem.getText().toString();
+        TodoItem itm = new TodoItem(etNewItem.getText().toString(),0);
         // Don't allow blank entries.
-        if(!itemText.isEmpty())
-            itemsAdapter.add(itemText);
+        if(!itm.getBody().isEmpty()) {
+            itemsAdapter.add(itm);
+            itm.save();
+        }
         etNewItem.setText("");
-        writeItems();
         hideKeyBoard(etNewItem);
     }
 
@@ -65,9 +65,10 @@ public class MainActivity extends AppCompatActivity {
                 new AdapterView.OnItemLongClickListener() {
                     @Override
                     public boolean onItemLongClick(AdapterView<?> adapter, View item, int pos, long id) {
+                        TodoItem itm = items.get(pos);
                         items.remove(pos);
+                        itm.delete();
                         itemsAdapter.notifyDataSetChanged();
-                        writeItems();
                         return true;
                     }
                 });
@@ -82,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
                         if (focusOnEditTextItem()) {
                             defocusNewItemEditText();
                         } else {
-                            editAdapterView(adapter,item,pos,id);
+                            editAdapterView(adapter, item, pos, id);
                         }
                         return;
                     }
@@ -120,31 +121,21 @@ public class MainActivity extends AppCompatActivity {
             //if pos=-1 then pos wasn't passed initially through AdapterView.OnItemClickListener or
             // did not make it to EditItemActivity
             if(pos>-1) {
-                items.set(pos, editTxt);
+                TodoItem itm = items.get(pos);
+                itm.setBody(editTxt);
                 itemsAdapter.notifyDataSetChanged();
-                writeItems();
+                itm.save();
             }
         }
     }
 
-    private void readItems(){
-        File filesDir = getFilesDir();
-        File todoFile = new File(filesDir,"todo.txt");
+    private void readItemsDB(){
         try{
-            items = new ArrayList<String>(FileUtils.readLines(todoFile));
-        }catch (IOException e){
-            items = new ArrayList<String>();
+            items = new Select().all().from(TodoItem.class).orderBy("priority ASC").execute();
+        }catch (RuntimeException e) {
+            items = new ArrayList<>();
         }
-    }
-
-    private void writeItems(){
-        File filesDir = getFilesDir();
-        File todoFile = new File(filesDir,"todo.txt");
-        try{
-            FileUtils.writeLines(todoFile, items);
-        }catch (IOException e){
-            e.printStackTrace();
-        }
+        return;
     }
 
     @Override
